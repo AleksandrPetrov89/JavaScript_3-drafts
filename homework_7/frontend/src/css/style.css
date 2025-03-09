@@ -1,0 +1,169 @@
+body {
+  background-color: rgb(224, 224, 224);
+}
+
+.desk {
+  width: 96%;
+  margin-left: 2%;
+  min-height: 80vh;
+  border-radius: 0.5rem;
+  position: relative;
+  font-family: sans-serif;
+  background: linear-gradient( #bbb, transparent 1px), linear-gradient( 90deg, #bbb, transparent 1px);
+  background-size: 15px 15px;
+  background-position: center center;
+  background-color: rgb(241, 240, 240);
+}
+
+.root {
+  background-color: rgb(207, 207, 207);
+  height: 2rem;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.btn {
+  font-size: 1rem;
+  padding: 0px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  height: 3rem;
+  border-radius: 1rem;
+  border-width: 1px;
+  box-sizing:content-box;
+}
+
+.add-ticket {
+  display: block;
+  margin-top: 0.5rem;
+  margin-right: 1rem;
+  margin-left: auto;
+}
+
+.tickets-box {
+  margin: 1rem;
+}
+
+.ticket {
+  border: 1px solid black;
+  border-top: none;
+  min-height: 3rem;
+  display: flex;
+  align-items: flex-start;
+  padding-right: 0.5rem;
+  font-family:inherit;
+  background-color: rgb(241, 240, 240);
+}
+
+.ticket:first-child {
+  border: 1px solid black;
+}
+
+.ticket-text {
+  font-size: 1rem;
+  margin: 0.5rem;
+  margin-right: 0rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.4rem;
+  pointer-events: none;
+}
+
+.p-timestamp {
+  width: 10rem;
+}
+
+.ticket-description {
+  width: calc(100% - 19.5rem);
+  padding: 0px;
+  margin: 0px;
+}
+
+.btn-ticket {
+  font-size: 1rem;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid black;
+  border-radius: 50%;
+  margin: 0.5rem;
+}
+
+.btn-ticket:disabled {
+  background-color: light-dark(rgba(239, 239, 239, 0.3), rgba(19, 1, 1, 0.3));
+  color: light-dark(rgba(16, 16, 16, 0.3), rgba(255, 255, 255, 0.3));
+  border-color: light-dark(rgba(118, 118, 118, 0.3), rgba(195, 195, 195, 0.3));
+}
+
+.btn-edit-ticket {
+  background-image: url("../img/free-icon-pencil-4277132.png");
+  background-size: 1rem;
+  background-repeat:no-repeat;
+  background-position: center;
+  margin-right: 0rem;
+}
+
+.btn-edit-ticket:disabled {
+  background-image: url("../img/free-icon-pencil-4277132-Grey.png");
+}
+
+.checkbox-done {
+  background-image: url("../img/free-icon-check-mark-5290999.png");
+  background-size: 1rem;
+  background-repeat:no-repeat;
+  background-position: center;
+}
+
+.form {
+  border:1px solid black;
+  border-radius: 1rem;
+  background-color: rgb(241, 240, 240);
+  width: 50%;
+  position: absolute;
+  top: 6rem;
+  left: 25%;
+  font-size: 1rem;
+}
+
+.form-title {
+  text-align: center;
+}
+
+.form-content {
+  width: 96%;
+  margin:  auto;
+}
+
+.form-content p {
+  margin-bottom: 0.4rem;
+}
+
+.form-content label {
+  display: block;
+  width: 100%;
+}
+
+.name {
+  font-size: inherit;
+  padding: 0.2em;
+  width: 100%;
+  box-sizing:border-box;
+  font-family: inherit;
+}
+
+.description {
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0.2em;
+  width: 100%;
+  box-sizing:border-box;
+  height: 4em;
+}
+
+.form-btn-box {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  text-align: end;
+}
+
+.btn-cancel {
+  margin-right: 1rem;
+}

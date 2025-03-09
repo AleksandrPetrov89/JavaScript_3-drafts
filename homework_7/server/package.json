@@ -1,0 +1,28 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "prestart": "npm install",
+    "start": "forever ./src/js/server.js",
+    "watch": "forever -w ./src/js/server.js",
+    "lint": "eslint ."
+  },
+  "author": "AleksandrPetrov89 <petrovav89@gmail.com>",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "@koa/cors": "^5.0.0",
+    "forever": "^1.0.1",
+    "koa": "^2.15.4",
+    "koa-body": "^6.0.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.31.0"
+  }
+}
