@@ -1,13 +1,25 @@
+import { v4 } from 'uuid';
+
 export const chatData = {
   users: [],
+  chat: [],
   
   checkAvailabilityName(name) {
     return this.users.some(user => user.name === name);
   },
 
-  add(user) {
+  addUser(user, ws) {
+    user.id = v4(),
+    user.userWS = ws;
     this.users.push(user);
   },
-}
 
-export const chat = [];
+  nameList() {
+    const names = this.users.map(user => user.name);
+    return names;
+  },
+
+  deleteWS(ws) {
+    this.users = this.users.filter(user => user.userWS !== ws);
+  },
+}

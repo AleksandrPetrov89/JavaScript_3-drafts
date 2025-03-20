@@ -1,5 +1,4 @@
 import Router from 'koa-router';
-import { v4 } from 'uuid';
 
 import {chatData} from '../../db/db.js'
 
@@ -13,10 +12,8 @@ router.post('/nickname', async (ctx) => {
     return;
   }
   const user = {
-    id: v4(),
     name: userName,
   }
-  chatData.add(user);
   ctx.response.body = user;
 });
 

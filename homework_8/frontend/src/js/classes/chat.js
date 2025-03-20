@@ -1,5 +1,4 @@
 export default class Chat {
-  #desk;
   #url;
   #createNickNameBind;
   #user;
@@ -8,18 +7,11 @@ export default class Chat {
 
   constructor(url) {
     this.#url = url;
-    this.#desk = document.querySelector(".desk");
   }
 
   // Метод, запускающий работу класса.
   start() {
-    const form = document.createElement("form");
-    form.classList.add("form");
-    form.innerHTML = `
-      <p class="form-title">Выберите псевдоним</p>
-      <input type="text" class="name" name="name" autocomplete="off" required>
-      <button type="submit" class="btn btn-ok">Продолжить</button>`;
-    this.#desk.append(form);
+    const form = createNickNameForm();
     this.#createNickNameBind = this.#createNickName.bind(this, form);
     form.addEventListener("submit", this.#createNickNameBind);
   }
@@ -46,14 +38,12 @@ export default class Chat {
       alert("Ошибка связи с сервером!");
       return;
     }
-
     if (answer) {
       if (answer.status === "This nickname is taken") {
         alert(`Псевдоним "${nickname}" занят!`);
         return;
       }       
     }
-
     this.#user = answer;
 
     form.removeEventListener("submit", this.#createNickNameBind);
@@ -65,8 +55,8 @@ export default class Chat {
     const wsUrl = "ws://" + this.#url + "/ws";
     const ws = new WebSocket(wsUrl);
 
-    this.#userBox = this.#createUserBox();
-    this.#chatForm = this.#createChatForm();
+    this.#userBox = createUserBox();
+    this.#chatForm = createChatForm();
 
     const sendMes = this.#sendMessage.bind(this, ws);
     this.#chatForm.addEventListener("submit", sendMes);
@@ -74,9 +64,12 @@ export default class Chat {
     ws.addEventListener('open', (e) => {
       console.log('ws open');
       console.log(e);
-      if (!e.data) return;
-      const data = JSON.parse(e.data);
-      console.log(data);
+      const data = {
+        type: "user",
+        user: this.#user,
+      }
+      const message = JSON.stringify(data);
+    ws.send(message);
     });
     
     ws.addEventListener('close', (e) => {
@@ -94,8 +87,16 @@ export default class Chat {
       console.log(e);
           
       const data = JSON.parse(e.data);
-      console.log(data);
-      console.log(Array.isArray(data));
+      // console.log(data);
+      // console.log(Array.isArray(data));
+
+      if (data.type === "user") {
+        console.log("показать пользователей");
+        const names = JSON.parse(data.users);
+        this.#userBox.innerHTML = "";
+        names.forEach(name => this.#showUser(name));
+        return;
+      }
 
       if (Array.isArray(data)) {
         data.forEach((mes) => this.#showMessage(mes));
@@ -106,24 +107,6 @@ export default class Chat {
     });
   }
 
-  #createUserBox() {
-    const userBox = document.createElement("div");
-    userBox.classList.add("user-box", "forms");
-    this.#desk.append(userBox);
-    return userBox;
-  }
-
-  #createChatForm() {
-    const chatForm = document.createElement("form");
-    chatForm.classList.add("chat-form", "forms");
-    chatForm.innerHTML = `
-      <div class="chat-box"></div>
-      <input type="text" class="input-message" name="message" autocomplete="off" required 
-      placeholder="Введите сообщение">`;
-    this.#desk.append(chatForm);
-    return chatForm;
-  }
-
   #sendMessage(ws, e) {
     e.preventDefault();
 
@@ -132,7 +115,8 @@ export default class Chat {
     inputEl.value = "";
 
     const data = {
-      user: this.#user,
+      type: "message",
+      name: this.#user.name,
       textMes: textMes,
     };
     const message = JSON.stringify(data);
@@ -140,7 +124,8 @@ export default class Chat {
   }
 
   #showMessage(data) {
-    const {user, textMes, timestamp} = data;
+    const {textMes, timestamp} = data;
+    let name = data.name;
 
     const messageDiv = document.createElement("div");
     messageDiv.classList.add("message");
@@ -150,10 +135,9 @@ export default class Chat {
     const chatBox = this.#chatForm.querySelector(".chat-box");
     chatBox.append(messageDiv);
     
-    let name = user.name;
-    const date = this.#formatsDate(timestamp);
+    const date = formatsDate(timestamp);
     
-    if (user.id === this.#user.id) {
+    if (name === this.#user.name) {
       name = "You";
       messageDiv.classList.add("you");
     }
@@ -167,24 +151,75 @@ export default class Chat {
     messageDiv.scrollIntoView();
   }
 
-  #formatsDate(timestamp) {
-    const date = new Date(timestamp);
+  #showUser(name) {
+    console.log("names:", name);
 
-    let minutes = String(date.getMinutes());
-    if (minutes.length < 2) minutes = "0" + minutes;
+    const userDiv = document.createElement("div");
+    userDiv.classList.add("user");
+    userDiv.innerHTML = `
+      <div class="user-photo"></div>
+      <div class="user-name"></div>`;
+    this.#userBox.append(userDiv);
 
-    let hours = String(date.getHours());
-    if (hours.length < 2) hours = "0" + hours;
+    const userName = userDiv.querySelector(".user-name");
+    if (this.#user.name === name) {
+      name = "You";
+      userName.classList.add("user-you");
+    }
 
-    let day = String(date.getDate());
-    if (day.length < 2) day = "0" + day;
-
-    let month = String(date.getMonth() + 1);
-    if (month.length < 2) month = "0" + month;
-
-    let year = String(date.getFullYear());
-
-    const formattedDate = hours + ":" + minutes + " " + day + "." + month + "." + year;
-    return formattedDate;
+    userName.textContent = name;
   }
+}
+
+function formatsDate(timestamp) {
+  const date = new Date(timestamp);
+
+  let minutes = String(date.getMinutes());
+  if (minutes.length < 2) minutes = "0" + minutes;
+
+  let hours = String(date.getHours());
+  if (hours.length < 2) hours = "0" + hours;
+
+  let day = String(date.getDate());
+  if (day.length < 2) day = "0" + day;
+
+  let month = String(date.getMonth() + 1);
+  if (month.length < 2) month = "0" + month;
+
+  let year = String(date.getFullYear());
+
+  const formattedDate = hours + ":" + minutes + " " + day + "." + month + "." + year;
+  return formattedDate;
+}
+
+function createUserBox() {
+  const userBox = document.createElement("div");
+  userBox.classList.add("user-box", "forms");
+  const desk = document.querySelector(".desk");
+  desk.append(userBox);
+  return userBox;
+}
+
+function createChatForm() {
+  const chatForm = document.createElement("form");
+  chatForm.classList.add("chat-form", "forms");
+  chatForm.innerHTML = `
+    <div class="chat-box"></div>
+    <input type="text" class="input-message" name="message" autocomplete="off" required 
+    placeholder="Введите сообщение">`;
+  const desk = document.querySelector(".desk");
+  desk.append(chatForm);
+  return chatForm;
+}
+
+function createNickNameForm() {
+  const form = document.createElement("form");
+  form.classList.add("form");
+  form.innerHTML = `
+    <p class="form-title">Выберите псевдоним</p>
+    <input type="text" class="name" name="name" autocomplete="off" required>
+    <button type="submit" class="btn btn-ok">Продолжить</button>`;
+  const desk = document.querySelector(".desk");
+  desk.append(form);
+  return form;
 }

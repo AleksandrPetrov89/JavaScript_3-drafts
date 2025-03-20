@@ -1,14 +1,11 @@
 import { createServer } from 'http';
-import { v4 as uuidv4 } from 'uuid';
 import Koa from 'koa';
 import { koaBody } from 'koa-body';
 import cors from '@koa/cors';
 import WS from 'ws';
 
 import router from './routes/index.js';
-import { json } from 'stream/consumers';
-
-import { chat } from './db/db.js'
+import { chatData } from './db/db.js'
 
 const app = new Koa();
 
@@ -38,20 +35,53 @@ server.listen(port, (err) => {
 });
 
 wsServer.on('connection', (ws) => {
-  ws.send(JSON.stringify(chat));
+  ws.send(JSON.stringify(chatData.chat));
+
+  const mailingNames = () => {
+    const nameList = (JSON.stringify(chatData.nameList()));
+      const data = {
+        type: "user",
+        users: nameList,
+      }
+      const names = JSON.stringify(data);
+      Array.from(wsServer.clients)
+        .filter(client => client.readyState === WS.OPEN)
+        .forEach(client => client.send(names));
+  }
 
   ws.on('message', (mes) => {
     const message = JSON.parse(mes);
-    message.timestamp = Date.now();
-    chat.push(message);
+    console.log("message: ", message);
 
-    console.log("сообщение:", message);
-    console.log("чат:", chat);
+    if (message.type === "user") {
+      chatData.addUser(message.user, ws);
+      mailingNames();
+      return;
+    }
+  
+    if (message.type === "message") {
+      message.timestamp = Date.now();
+      chatData.chat.push(message);
 
-    const eventData = JSON.stringify(message);
+      // console.log("сообщение:", message);
+      // console.log("чат:", chatData.chat);
 
-    Array.from(wsServer.clients)
-      .filter(client => client.readyState === WS.OPEN)
-      .forEach(client => client.send(eventData));
+      const eventData = JSON.stringify(message);
+
+      Array.from(wsServer.clients)
+        .filter(client => client.readyState === WS.OPEN)
+        .forEach(client => client.send(eventData));
+    }
+  });
+
+  ws.on('close', (e) => {
+    console.log("close: ", e);
+
+    chatData.deleteWS(ws);
+    mailingNames();
+  });
+
+  ws.on('error', (e) => {
+    console.log("error", e);
   });
 });
