@@ -10,12 +10,16 @@ export default class Chat {
   }
 
   // Метод, запускающий работу класса.
+  //Создает форму для ввода псевдонима и ждет ее отправки
   start() {
     const form = createNickNameForm();
     this.#createNickNameBind = this.#createNickName.bind(this, form);
     form.addEventListener("submit", this.#createNickNameBind);
   }
 
+  // Метод, который отправляет введенный псевдоним на сервер. 
+  //Если такой псевдоним занят, то выводит соответствующее уведомление.
+  //Если псевдоним свободен - удаляет форму ввода псевдонима
   async #createNickName(form, e) {
     e.preventDefault();
 
@@ -51,6 +55,11 @@ export default class Chat {
     this.#openChat();
   }
 
+  // Метод, управляющий работой чата.
+  //Осуществляет связь с сервером посредством "WebSocket", создает окно с
+  //псевдонимами всех подключенных пользователей и окно чата.
+  //При соединении отправляет на сервер псевдоним пользователя, отправляет и 
+  //получает сообщения.
   #openChat() {
     const wsUrl = "ws://" + this.#url + "/ws";
     const ws = new WebSocket(wsUrl);
@@ -87,26 +96,29 @@ export default class Chat {
       console.log(e);
           
       const data = JSON.parse(e.data);
-      // console.log(data);
-      // console.log(Array.isArray(data));
 
+      //Обновляет список участников чата в окне пользователей
       if (data.type === "user") {
-        console.log("показать пользователей");
         const names = JSON.parse(data.users);
         this.#userBox.innerHTML = "";
         names.forEach(name => this.#showUser(name));
         return;
       }
 
+      //Отображает в окне чата все предыдущие сообщения (историю чата)
       if (Array.isArray(data)) {
         data.forEach((mes) => this.#showMessage(mes));
         return;
       }
 
+      //Отображает в окне чата новое сообщение
       this.#showMessage(data);
     });
   }
 
+  // Метод, отправляющий сообщение на сервер.
+  //Очищает поле ввода сообщения, формирует объект, содержащий тип сообщения, 
+  //псевдоним пользователя и текст сообщения, и отправляет его на сервер.
   #sendMessage(ws, e) {
     e.preventDefault();
 
@@ -123,6 +135,8 @@ export default class Chat {
     ws.send(message);
   }
 
+  // Метод, отображающий сообщение в окне чата.
+  //Формирует из имени отправителя и форматированной даты пояснение к сообщению.
   #showMessage(data) {
     const {textMes, timestamp} = data;
     let name = data.name;
@@ -137,6 +151,9 @@ export default class Chat {
     
     const date = formatsDate(timestamp);
     
+    //Если отправитель сообщения текущий пользователь, то его псевдоним
+    //в пояснении к сообщению заменяется на "You", пояснение выравнивается 
+    //по правому краю и окрашивается в алый цвет шрифта.
     if (name === this.#user.name) {
       name = "You";
       messageDiv.classList.add("you");
@@ -148,12 +165,13 @@ export default class Chat {
     explanP.textContent = explanation;
     messageText.textContent = textMes;
 
+    //Прокручивает список сообщений до данного нового сообщения
     messageDiv.scrollIntoView();
   }
 
+  // Метод, отображающий псевдоним участника чата.
+  //У текущего пользователя, вместо псевдонима, отображается "You" алого цвета
   #showUser(name) {
-    console.log("names:", name);
-
     const userDiv = document.createElement("div");
     userDiv.classList.add("user");
     userDiv.innerHTML = `
@@ -171,6 +189,8 @@ export default class Chat {
   }
 }
 
+// Функция принимает временую метку и возвращает строку с временем и 
+//датой в определенном формате.
 function formatsDate(timestamp) {
   const date = new Date(timestamp);
 
@@ -192,6 +212,8 @@ function formatsDate(timestamp) {
   return formattedDate;
 }
 
+// Функция, которая создает и добавляет на страницу окно для отображения 
+//псевдонимов участников чата.
 function createUserBox() {
   const userBox = document.createElement("div");
   userBox.classList.add("user-box", "forms");
@@ -200,6 +222,8 @@ function createUserBox() {
   return userBox;
 }
 
+// Функция, которая создает и добавляет на страницу форму для отображения и
+//отправки сообщений.
 function createChatForm() {
   const chatForm = document.createElement("form");
   chatForm.classList.add("chat-form", "forms");
@@ -212,6 +236,8 @@ function createChatForm() {
   return chatForm;
 }
 
+// Функция, которая создает и добавляет на страницу форму для 
+//ввода псевдонима.
 function createNickNameForm() {
   const form = document.createElement("form");
   form.classList.add("form");
