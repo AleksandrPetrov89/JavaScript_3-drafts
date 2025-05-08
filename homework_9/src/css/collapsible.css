@@ -1,0 +1,43 @@
+.task-1>p{
+  text-align: center;
+}
+
+.collapse-box {
+  padding-left: 1rem;
+}
+
+.collapse-but {
+  color: white;
+  background-color: rgb(49, 114, 255);
+  font-size: 1rem;
+  border-radius: 0.4rem;
+  border: none;
+  padding: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.collapse-but:hover {
+  outline: 0.2rem solid rgb(101, 204, 252);;
+}
+
+.collapse-but:active {
+  background-color: rgb(6, 84, 253);
+}
+
+.collapse-content>p {
+  border: 1px solid rgb(204, 203, 203);
+  padding: 1rem;
+  margin: 0px;
+}
+
+.collapse-content {
+  width: 50%;
+  overflow: hidden;
+  height: auto;
+  max-height: 30vh;
+  transition: max-height 1s linear 0s;
+}
+
+.collapse-content.hidden {
+  max-height: 0vh;
+}
