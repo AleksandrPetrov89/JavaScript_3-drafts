@@ -32,7 +32,7 @@
 
 .collapse-content {
   width: 50%;
-  overflow: hidden;
+  overflow: auto;
   height: auto;
   max-height: 30vh;
   transition: max-height 1s linear 0s;

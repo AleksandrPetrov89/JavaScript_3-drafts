@@ -21,7 +21,6 @@ export default class Collapse {
     this.#content = document.createElement("div");
     this.#content.classList.add("collapse-content", "hidden");
     this.#content.innerHTML = `<p>${this.#text}</p>`;
-    // this.#content.textContent = this.#text;
 
     this.#box = document.createElement("div");
     this.#box.classList.add("collapse-box");
